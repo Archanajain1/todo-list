@@ -1,11 +1,17 @@
 import { LitElement, html, css } from 'lit';
+import '@lion/ui/define/lion-form.js';
 import '@lion/ui/define/lion-input.js';
 import '@lion/ui/define/lion-checkbox.js';
 import '@lion/ui/define/lion-button.js';
-import '@lion/ui/define/lion-input.js';
-import { Required, MinMaxLength } from '@lion/ui/form-core.js';
 import { loadDefaultFeedbackMessages } from '@lion/ui/validate-messages.js';
-import { Validator } from '@lion/ui/form-core.js';
+//import { LocalizeMixin,localize } from '@lion/ui/localize.js';
+import {
+  Required,
+  MinMaxLength,
+  MaxNumber,
+  MinLength,
+  Pattern,
+} from '@lion/ui/form-core.js';
 
 class TodoApp extends LitElement {
   static properties = {
@@ -26,13 +32,17 @@ class TodoApp extends LitElement {
     }
 
     .btn-delete {
-      padding: 0px 5px;
+      line-height: 9px;
+      padding: 4px;
     }
 
-    .inputbox,
-    .input-checkbox {
+    .inputbox {
       width: auto;
       display: inline-block;
+    }
+
+    .input-checkbox {
+      display: inline-flex;
     }
 
     .warnings {
@@ -48,17 +58,23 @@ class TodoApp extends LitElement {
       padding: 15px;
       background-color: white;
       height: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
     }
-
-    #todo-header {
-      background-color: #3498db;
+    label {
+      display: block;
+      margin-top: 3px !important;
+    }
+    h2 {
+      background-color: black;
       color: #fff;
       padding: 20px;
       text-align: center;
       font-size: 1.5em;
+      margin-bottom: 15px;
+    }
+    .form-content {
+      margin-left: 43%;
+    }
+    .list-align {
       margin-bottom: 15px;
     }
   `;
@@ -79,45 +95,48 @@ class TodoApp extends LitElement {
     const unfinishedCount = this.todos.length - finishedCount;
     return html`
       <div class="container" id="todo-container">
-        <div>
-          <div id="todo-header">Todo List</div>
-          <lion-input
-            .validators="${new MinMaxLength({ min: 10, max: 20 })}"
-            class="inputbox"
-            name="input"
-            id="addTodoInput"
-            onKeyPress="if(this.value.length>9) return false;"
-            placeholder="Enter Task Name"
-          >
-          </lion-input>
-          <lion-button
-            label="Button To Add Task"
-            class="btn"
-            @click=${this._addTodo}
-            .modelValue="${'foo'}"
-            >Add</lion-button
-          >
-          <div id="errorMsg" class="warnings">
-            Task name is alpha numeric name with length between 3 to 10
-            characters
-          </div>
-          <ol>
+        <h2>Todo List</h2>
+        <div class="form-content">
+          <lion-form class="center">
+            <form>
+              <lion-input
+                class="inputbox"
+                name="addTodoInput"
+                id="addTodoInput"
+                label="Enter Task name"
+                placeholder="Enter Task Name"
+              >
+              </lion-input>
+              <lion-button
+                label="Button To Add Task"
+                title="button"
+                type="button"
+                class="btn"
+                @click=${this._addTodo}
+                >Add</lion-button
+              >
+            </form>
+          </lion-form>
+          <ol class="list-align">
             ${this.todos.map(
               todo => html`
-                <li>
+                <li class="list-align">
                   <lion-checkbox
                     class="input-checkbox"
                     .checked=${todo.finished}
                     @change=${e => this._changeTodoFinished(e, todo)}
+                    label="Todo"
                   >
                   </lion-checkbox>
-                  ${todo.text}
+
+                  <span>${todo.text}<span>
+
                   <lion-button
                     label="Button To Remove Task"
                     class="btn btn-delete"
                     @click=${() => this._removeTodo(todo)}
                   >
-                    X
+                    x
                   </lion-button>
                 </li>
               `
@@ -137,13 +156,13 @@ class TodoApp extends LitElement {
     const errMsg = this.shadowRoot.getElementById('errorMsg');
     const text = input.value;
 
-    loadDefaultFeedbackMessages();
+    //loadDefaultFeedbackMessages();
 
     if (text.length > 2 && text.length < 11 && this.regex.test(text)) {
       this.todos = [...this.todos, { text, finished: false }];
-      errMsg.style.display = 'none';
+      //errMsg.style.display = 'none';
     } else {
-      errMsg.style.display = 'block';
+      //errMsg.style.display = 'block';
     }
     input.value = '';
 
