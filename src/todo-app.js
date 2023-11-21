@@ -1,17 +1,12 @@
 import { LitElement, html, css } from 'lit';
+import { loadDefaultFeedbackMessages } from '@lion/ui/validate-messages.js';
 import '@lion/ui/define/lion-form.js';
 import '@lion/ui/define/lion-input.js';
 import '@lion/ui/define/lion-checkbox.js';
 import '@lion/ui/define/lion-button.js';
-import { loadDefaultFeedbackMessages } from '@lion/ui/validate-messages.js';
-//import { LocalizeMixin,localize } from '@lion/ui/localize.js';
-import {
-  Required,
-  MinMaxLength,
-  MaxNumber,
-  MinLength,
-  Pattern,
-} from '@lion/ui/form-core.js';
+import './todo-list.js';
+
+import { Required, Pattern, MinLength, MaxLength } from '@lion/ui/form-core.js';
 
 class TodoApp extends LitElement {
   static properties = {
@@ -31,23 +26,27 @@ class TodoApp extends LitElement {
       background-color: #bbb;
     }
 
+    [id^=feedback-lion-input]{
+      color:red;
+    }
+
+    .btn-add {
+      margin-top: 15px;
+      position: fixed;
+    }
+
     .btn-delete {
       line-height: 9px;
       padding: 4px;
     }
 
-    .inputbox {
+    .input-box {
       width: auto;
       display: inline-block;
     }
 
     .input-checkbox {
-      display: inline-flex;
-    }
-
-    .warnings {
-      color: red;
-      display: none;
+      
     }
 
     #todo-container {
@@ -59,10 +58,12 @@ class TodoApp extends LitElement {
       background-color: white;
       height: 100%;
     }
+
     label {
       display: block;
       margin-top: 3px !important;
     }
+
     h2 {
       background-color: black;
       color: #fff;
@@ -71,11 +72,9 @@ class TodoApp extends LitElement {
       font-size: 1.5em;
       margin-bottom: 15px;
     }
+
     .form-content {
       margin-left: 43%;
-    }
-    .list-align {
-      margin-bottom: 15px;
     }
   `;
 
@@ -83,101 +82,102 @@ class TodoApp extends LitElement {
     super();
     this.header = 'My Todo app';
     this.todos = [
-      { text: 'Task 1', finished: true },
-      { text: 'Task 2', finished: true },
-      { text: 'Task 3', finished: true },
+      { text: 'Lit', finished: true },
+      { text: 'Lion', finished: true },
+      { text: 'App', finished: true },
     ];
-    this.regex = /^[a-zA-Z0-9]+$/;
+    this.regex = /^[a-zA-Z]+$/;
   }
 
   render() {
     const finishedCount = this.todos.filter(e => e.finished).length;
     const unfinishedCount = this.todos.length - finishedCount;
+
     return html`
       <div class="container" id="todo-container">
         <h2>Todo List</h2>
+
         <div class="form-content">
           <lion-form class="center">
             <form>
               <lion-input
-                class="inputbox"
+                class="input-box"
                 name="addTodoInput"
                 id="addTodoInput"
                 label="Enter Task name"
                 placeholder="Enter Task Name"
+                .validators="${[
+                  new Pattern(/^[a-zA-Z\s]*$/, {
+                    getMessage: () => 'Only alphabets are allowed',
+                  }),
+                  new MinLength(3, {
+                    getMessage: () => 'Minimum 3 characters required',
+                  }),
+                  new MaxLength(10, {
+                    getMessage: () => 'Maximum 10 characters permitted',
+                  }),
+                  new Required(
+                    {},
+                    { getMessage: () => 'Task name is required' }
+                  ),
+                ]}"
               >
               </lion-input>
+
               <lion-button
                 label="Button To Add Task"
                 title="button"
                 type="button"
-                class="btn"
+                class="btn btn-add"
                 @click=${this._addTodo}
-                >Add</lion-button
               >
+                Add
+              </lion-button>
             </form>
           </lion-form>
-          <ol class="list-align">
-            ${this.todos.map(
-              todo => html`
-                <li class="list-align">
-                  <lion-checkbox
-                    class="input-checkbox"
-                    .checked=${todo.finished}
-                    @change=${e => this._changeTodoFinished(e, todo)}
-                    label="Todo"
-                  >
-                  </lion-checkbox>
 
-                  <span>${todo.text}<span>
+          <todo-list
+            .todos=${this.todos}
+            @change-todo-finished="${this._changeTodoFinished}"
+            @remove-todo="${this._removeTodo}"
+          >
+          </todo-list>
 
-                  <lion-button
-                    label="Button To Remove Task"
-                    class="btn btn-delete"
-                    @click=${() => this._removeTodo(todo)}
-                  >
-                    x
-                  </lion-button>
-                </li>
-              `
-            )}
-          </ol>
+          <div class="status-finished">Total Finished: ${finishedCount}</div>
 
-          <div>Total Finished: ${finishedCount}</div>
-          <div>Total Unfinished: ${unfinishedCount}</div>
+          <div class="status-unfinished">Total Unfinished: ${unfinishedCount}</div>
         </div>
       </div>
     `;
   }
 
-  //adds items to the list
+  //This function is called to add items to the list
   _addTodo() {
     const input = this.shadowRoot.getElementById('addTodoInput');
-    const errMsg = this.shadowRoot.getElementById('errorMsg');
-    const text = input.value;
+    const inputText = input.value;
 
-    //loadDefaultFeedbackMessages();
+    //Loads error messages
+    loadDefaultFeedbackMessages();
 
-    if (text.length > 2 && text.length < 11 && this.regex.test(text)) {
-      this.todos = [...this.todos, { text, finished: false }];
-      //errMsg.style.display = 'none';
-    } else {
-      //errMsg.style.display = 'block';
+    //Add new tasks to the list only if input is valid
+    if (
+      inputText.length > 2 &&
+      inputText.length < 11 &&
+      this.regex.test(inputText)
+    ) {
+      this.todos = [...this.todos, { inputText, finished: false }];
     }
     input.value = '';
-
-    // this.todos.push({text, finished: false});
-    // this.requestUpdate();
   }
 
   //removes todo item from the list
-  _removeTodo(todo) {
-    this.todos = this.todos.filter(e => e !== todo);
+  _removeTodo(e) {
+    this.todos = this.todos.filter(todo => todo !== e.detail);
   }
 
   //change todo item status
-  _changeTodoFinished(e, changedTodo) {
-    const finished = e.target.checked;
+  _changeTodoFinished(e) {
+    const { changedTodo, finished } = e.detail;
 
     this.todos = this.todos.map(todo => {
       if (todo !== changedTodo) {
