@@ -126,7 +126,7 @@ describe('TodoApp', () => {
     const divFinish = element.shadowRoot.querySelector('.status-finished');
     expect(divFinish).to.exist;
     expect(divFinish.textContent).to.equal(
-      'Total Finished: ' + element.todos.filter(e => e.finished).length
+      `Total Finished: ${element.todos.filter(e => e.finished).length}`
     );
   });
 
@@ -134,8 +134,9 @@ describe('TodoApp', () => {
     const divUnfinish = element.shadowRoot.querySelector('.status-unfinished');
     expect(divUnfinish).to.exist;
     expect(divUnfinish.textContent).to.equal(
-      'Total Unfinished: ' +
-        (element.todos.length - element.todos.filter(e => e.finished).length)
+      `Total Unfinished: ${
+        element.todos.length - element.todos.filter(e => e.finished).length
+      }`
     );
   });
 });

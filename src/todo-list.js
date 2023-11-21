@@ -1,8 +1,10 @@
 import { LitElement, html, css } from 'lit';
+
 export class TodoList extends LitElement {
   static properties = {
     todos: { type: Array },
   };
+
   static styles = css`
     .btn {
       border: 1px solid gray;
@@ -34,6 +36,7 @@ export class TodoList extends LitElement {
       margin-bottom: 15px;
     }
   `;
+
   render() {
     if (!this.todos) {
       return html``;
@@ -65,7 +68,7 @@ export class TodoList extends LitElement {
     `;
   }
 
-  //This function is called on checkbox click to update task status
+  // This function is called on checkbox click to update task status
   _changeTodoFinished(e, changedTodo) {
     const eventDetails = { changedTodo, finished: e.target.checked };
     this.dispatchEvent(
@@ -73,7 +76,7 @@ export class TodoList extends LitElement {
     );
   }
 
-  //This function is called to remove any task from the list
+  // This function is called to remove any task from the list
   _removeTodo(item) {
     this.dispatchEvent(new CustomEvent('remove-todo', { detail: item }));
   }

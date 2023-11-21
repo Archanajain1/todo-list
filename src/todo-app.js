@@ -26,8 +26,8 @@ class TodoApp extends LitElement {
       background-color: #bbb;
     }
 
-    [id^=feedback-lion-input]{
-      color:red;
+    [id^='feedback-lion-input'] {
+      color: red;
     }
 
     .btn-add {
@@ -46,7 +46,6 @@ class TodoApp extends LitElement {
     }
 
     .input-checkbox {
-      
     }
 
     #todo-container {
@@ -151,15 +150,15 @@ class TodoApp extends LitElement {
     `;
   }
 
-  //This function is called to add items to the list
+  // This function is called to add items to the list
   _addTodo() {
     const input = this.shadowRoot.getElementById('addTodoInput');
     const inputText = input.value;
 
-    //Loads error messages
+    // Loads error messages
     loadDefaultFeedbackMessages();
 
-    //Add new tasks to the list only if input is valid
+    // Add new tasks to the list only if input is valid
     if (
       inputText.length > 2 &&
       inputText.length < 11 &&
@@ -170,12 +169,12 @@ class TodoApp extends LitElement {
     input.value = '';
   }
 
-  //removes todo item from the list
+  // removes todo item from the list
   _removeTodo(e) {
     this.todos = this.todos.filter(todo => todo !== e.detail);
   }
 
-  //change todo item status
+  // change todo item status
   _changeTodoFinished(e) {
     const { changedTodo, finished } = e.detail;
 
