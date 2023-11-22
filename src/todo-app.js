@@ -153,18 +153,18 @@ class TodoApp extends LitElement {
   // This function is called to add items to the list
   _addTodo() {
     const input = this.shadowRoot.getElementById('addTodoInput');
-    const inputText = input.value;
+    const text = input.value;
 
     // Loads error messages
     loadDefaultFeedbackMessages();
 
     // Add new tasks to the list only if input is valid
     if (
-      inputText.length > 2 &&
-      inputText.length < 11 &&
-      this.regex.test(inputText)
+      text.length > 2 &&
+      text.length < 11 &&
+      this.regex.test(text)
     ) {
-      this.todos = [...this.todos, { inputText, finished: false }];
+      this.todos = [...this.todos, { text, finished: false }];
     }
     input.value = '';
   }
